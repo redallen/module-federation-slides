@@ -1,40 +1,264 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+    <title>Module Federation Slides</title>
 
-		<link rel="stylesheet" href="dist/reset.css">
-		<link rel="stylesheet" href="dist/reveal.css">
-		<link rel="stylesheet" href="dist/theme/black.css" id="theme">
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css" id="theme">
 
-		<!-- Theme used for syntax highlighted code -->
-		<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
-			</div>
-		</div>
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
 
-		<script src="dist/reveal.js"></script>
-		<script src="plugin/notes/notes.js"></script>
-		<script src="plugin/markdown/markdown.js"></script>
-		<script src="plugin/highlight/highlight.js"></script>
-		<script>
-			// More info about initialization & config:
-			// - https://revealjs.com/initialization/
-			// - https://revealjs.com/config/
-			Reveal.initialize({
-				hash: true,
+<section>
+  <h1>
+    Module federation
+  </h1>
+  A new Webpack 5 feature
+</section>
+<section>
+  <blockquote>
+    Webpack 5 adds a new feature called "Module Federation", which allows multiple webpack builds to work together. From runtime perspective modules from multiple builds will behave like a huge connected module graph. From developer perspective modules can be imported from specified remote builds and used with minimal restrictions.
+  </blockquote>
+  - @sokra, <a href="https://webpack.js.org/blog/2020-10-10-webpack-5-release/#module-federation">Webpack 5 release notes</a>
+</section>
+<section>
+  <blockquote>
+    Multiple separate builds should form a single application. These separate builds should not have dependencies between each other, so they can be developed and deployed individually.
+    <p>
+      This is often known as Micro-Frontends, but is not limited to that.
+    </p>
+  </blockquote>
+  - <a href="https://webpack.js.org/concepts/module-federation/">Webpack 5 docs</a>
+</section><section>
+  <h2>
+    Who wrote it? 
+  </h2>
+  <p>
+    <a href="https://github.com/ScriptedAlchemy">A better Zack.</a>
+  </p>
+  <p>
+    <a href="https://github.com/sokra">Tobias Koppers</a> (Webpack creator and maintainer)
+  </p>
+</section>
+<section>
+  <h2><img src="zack_jackson.jpg" width="64px" /> Zack Jackson <img src="zack_jackson.jpg" width="64px" /></h2>
+  <ul>
+    <li>Principal engineer using module federation at <a href="https://shop.lululemon.com/">lululemon.com</a></li>
+    <li>Added HMR to mini-css-extract-plugin</li>
+    <li><a href="https://github.com/faceyspacey/react-universal-component">react-universal-component</a> maintainer</li>
+  </ul>
+</section>
+<section>
+  <h2><img src="sokra.png" width="64px" /> Tobias Koppers <img src="sokra.png" width="64px" /></h2>
+  <img src="sokra_contributions.png" />
+</section>
+<section>
+  <h2>
+    Their reason?
+  </h2>
+  <p><a href="https://webpack.js.org/plugins/dll-plugin/">DLLPlugin</a> wasn't good enough</p>
+  <pre><code data-line-numbers="4">new webpack.DllReferencePlugin({
+  context: __dirname,
+  manifest: require('./manifest.json'),
+  scope: 'xyz',
+  sourceType: 'commonjs2'
+});
+  </code></pre>
+</section>
+<section>
+  <h2>
+    The <a href="https://github.com/webpack/webpack/issues/10352">RFC</a> reason
+  </h2>
+  <blockquote>
+    <ul>
+      <li>I expect to be able to require modules or chunks from other Webpack bundles hosted elsewhere.</li>
+      <li>I don't want to manage externals and worry about synchronizing them across systems</li>
+      <li>I don't want a single point of failure, like a commons chunk</li>
+      <li>I want to load code from another build, like dynamic imports and code-splitting</li>
+    </ul>
+  </blockquote>
+</section>
+<section>
+  <h2>
+    The <a href="https://github.com/webpack/webpack/issues/10352">RFC</a> reason, cont.
+  </h2>
+  <blockquote>
+    <ul>
+      <li>I want multiple builds to look and feel like a monolith in the client</li>
+      <li>I am able to deploy frontend apps independently and expect Webpack to orchestrate at runtime</li>
+      <li>I don't want to use less integrated/framework oriented solutions like SingleSPA, browser events, service workers - I want to use Webpack as the host container for foreign chunks and modules...</li>
+    </ul>
+  </blockquote>
+</section>
+<section>
+  <h2>
+    The enterprise reason
+  </h2>
+  <blockquote>
+    <ul>
+      <li>If desired, an entire company should be able to federate code across every UI, from user-facing to backend. Effectively turning a multi build, multi team, multi mono-repo company into one SPA in the browser. Removing the need for page reloads or downloading additional code and bundles containing mostly the same node modules</li>
+    </ul>
+  </blockquote>
+</section>
+<section>
+  <h2>
+    The ask
+  </h2>
+  <pre>
+    <code>
+      import('website-one/MegaNav')
+    </code>
+  </pre>
+</section>
+<section>
+  <h2>
+    <a href="https://github.com/webpack/webpack/pulls?q=is%3Apr+is%3Amerged+federation">The solution PRs</a>
+  </h2>
+  It's been 10 months since <a href="https://github.com/webpack/webpack/projects/6">the groundwork,</a> the earliest beta release was in May 2020
+  <ol style="font-size: 0.7em">
+    <li>feat: support custom chunk name in container expose options</li>
+    <li>fix: minified versionLt did not match the original function</li>
+    <li>A few little bugfixes to Module Federation</li>
+    <li>rename module federation classes for be more specific</li>
+    <li>Refactor shared modules to allows multiple version in a single build</li>
+    <li>add script external</li>
+    <li>Versioned shared modules for Module Federation</li>
+    <li>change Module Federation API to be more similar to exports field</li>
+    <li>Merge Module Federation into webpack 5 beta</li>
+    <li>Module federation bugfixes and DX</li>
+    <li>fix: module federation plugin library should be optional</li>
+  </ol>
+</section>
+<section>
+  <h2>
+    Internals
+  </h2>
+  The ModuleFederationPlugin consists of two plugins:
+  <ul>
+    <li>ContainerPlugin</li>
+    <li>ContainerReferencePlugin</li>
+  </ul>
+</section>
+<section>
+  ContainerPlugin allows runtime injection
+  <pre><code>new ModuleContainerPlugin({
+  name: 'app_one',
+  shared: {
+    react: 'react',
+  },
+  exposes: {
+    Title: './src/components/Title'
+  }
+});</code></pre>
+  <pre><code>__webpack_override__({
+    Title: () => () => 'I will override Title module',
+});
+  </code></pre>
+</section>
+<section>
+  ContainerReferencePlugin allows naming remotes
+  <pre><code data-line-numbers="3">new ModuleReferencePlugin({
+  remoteType: 'global',
+  remotes: ['app_one', 'app_two'],
+  overrides: {
+    react: 'react'
+  }
+});
+  </code></pre>
+</section>
+<section>
+  <h2>
+    All together
+  </h2>
+  <pre><code>new ModuleFederationPlugin({
+    name: 'app_one',
+    remotes: {
+        app_two: 'app_two'
+    },
+    shared: ['react', 'react-dom']
+})</code></pre>
+  and
+  <pre><code>new ModuleFederationPlugin({
+    name: 'app_two',
+    exposes: {
+        Title: './src/components/Title'
+    },
+    shared: ['react', 'react-dom']
+})</code></pre></section>
+<section>
+  <h2>
+    Simple demo
+  </h2>
+</section>
+<section>
+  <h2>
+    <a href="https://github.com/webpack/webpack/blob/a83884a518bd5f22599eabaa7a763f82e4888813/declarations/plugins/container/ModuleFederationPlugin.d.ts">API</a>
+  </h2>
+  <pre><code>export interface ModuleFederationPluginOptions {
+  name?: string;
+  exposes?: { [moduleName]: [filepath] };
+  filename?: string; // Defaults to remoteEntry.js
+  library?: { name?: string, type: 'var' | 'module' };
+  remoteType?: 'var' | 'module';
+  remotes?: { [remoteName]: [localRemoteName] };
+  shared?: {
+    [moduleName]:
+      { eager?: boolean,
+        version?: string,
+        singleton?: boolean,
+        shareScope?: string } };
+}</code></pre>
+</section>
+<section>
+  <h2>
+    More demos
+  </h2>
+  <a href="https://github.com/module-federation/module-federation-examples">ScriptedAlchemy's holy repo</a>
+</section>
+<section>
+  <h2>
+    Gotcha #1: No dynamic remotes
+  </h2>
+  To use dynamic remotes you can use <a href="https://github.com/module-federation/module-federation-examples/blob/master/advanced-api/dynamic-remotes/app1/src/App.js#L3">~80 lines of boilerplate</a>
+</section>
+<section>
+  <h2>
+    Gotcha #2: Public path
+  </h2>
+  To avoid hardcoding at build time: <a href="https://github.com/module-federation/module-federation-examples/blob/master/startup-code/app2/webpack.config.js"><code>publicPath: 'auto'</code></a>
+</section>
+<section>
+  <blockquote>
+    This is my latest obsession in an attempt to take back control from tag management teams. The approach isn’t immediately understood, considering tags are external scripts. Luckily, part of module Federation was rewriting externals and how it works. So vendor tags can be added as async external scripts that webpack can load on demand. Analytics code and other integrations could be imported into the application lifecycle or internal state. You’d also be able to async import vendor when needed since webpack is managing the code.
+  </blockquote>
+  - <a href="https://medium.com/@ScriptedAlchemy/micro-fe-architecture-webpack-5-module-federation-and-custom-startup-code-9cb3fcd066c">Zack Jackson on Medium</a>
+</section>
 
-				// Learn about plugins: https://revealjs.com/plugins/
-				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
-			});
-		</script>
-	</body>
+
+      </div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/search/search.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script>
+      // More info about initialization & config:
+      // - https://revealjs.com/initialization/
+      // - https://revealjs.com/config/
+      Reveal.initialize({
+        hash: true,
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [ RevealHighlight, RevealSearch ],
+      });
+    </script>
+  </body>
 </html>
