@@ -24,6 +24,70 @@
   A new Webpack 5 feature
 </section>
 <section>
+  <h2>
+    Before webpack
+  </h2>
+  <pre><code>&lt;script src="//some-cdn.com/react.js"&gt;&lt;/script&gt;
+&lt;script src="//some-cdn.com/react-dom.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  const MyApp = () => "Hello world";
+  const root = document.getElementById('root');
+  ReactDOM.render(React.createElement(MyApp), root);
+&lt;/script&gt;</code></pre>
+</section>
+<section>
+  <h2>
+    After webpack
+  </h2>
+  <pre><code>import React from 'react';
+import ReactDOM from 'react-dom';
+const MyApp = () => "Hello world";
+const root = document.getElementById('root');
+ReactDOM.render(<MyApp /> root);</code></pre>
+  which creates
+  <pre><code>&lt;script src="bundle.js"&gt;&lt;/script&gt;</code></pre>
+</section>
+<section>
+  <h2>
+    You can bundle <a href="https://webpack.js.org/">anything!</a>
+  </h2>
+  <img src="webpack1.png" />
+</section>
+<section>
+  <h2>
+    Module graphs pick modules
+  </h2>
+  <img src="module-graph.png" />
+</section>
+<section>
+  <h2>
+    Modules are grouped into chunks
+  </h2>
+  <img src="bundle-analyzer.png" />
+</section>
+<section>
+  <h2>
+    But you can't share the chunks
+  </h2>
+  <img src="no-sharing.jpg" />
+</section>
+<section>
+  <pre><code>console.log("I will not repeat myself");
+console.log("I will not repeat myself");
+console.log("I will not repeat myself");
+console.log("I will not repeat myself");
+console.log("I will not repeat myself");
+console.log("I will not repeat myself");
+console.log("I will not repeat myself");
+console.log("I will not repeat myself");
+console.log("I will not repeat myself");
+console.log("I will not repeat myself");
+console.log("I will not repeat myself");
+console.log("I will not repeat myself");
+console.log("I will not repeat myself");
+console.log("I will not repeat myself");</code></pre>
+</section>
+<section>
   <blockquote>
     Webpack 5 adds a new feature called "Module Federation", which allows multiple webpack builds to work together. From runtime perspective modules from multiple builds will behave like a huge connected module graph. From developer perspective modules can be imported from specified remote builds and used with minimal restrictions.
   </blockquote>
@@ -42,7 +106,7 @@
     Who wrote it? 
   </h2>
   <p>
-    <a href="https://github.com/ScriptedAlchemy">A better Zack.</a>
+    <a href="https://github.com/ScriptedAlchemy">A better Zack</a>
   </p>
   <p>
     <a href="https://github.com/sokra">Tobias Koppers</a> (Webpack creator and maintainer)
@@ -51,13 +115,17 @@
 <section>
   <h2><img src="zack_jackson.jpg" width="64px" /> Zack Jackson <img src="zack_jackson.jpg" width="64px" /></h2>
   <ul>
-    <li>Principal engineer using module federation at <a href="https://shop.lululemon.com/">lululemon.com</a></li>
+    <li>Principal engineer at <a href="https://shop.lululemon.com/">lululemon.com</a></li>
     <li>Added HMR to mini-css-extract-plugin</li>
+    <li><a href="https://github.com/webpack/webpack">webpack</a> maintainer</li>
     <li><a href="https://github.com/faceyspacey/react-universal-component">react-universal-component</a> maintainer</li>
   </ul>
 </section>
 <section>
   <h2><img src="sokra.png" width="64px" /> Tobias Koppers <img src="sokra.png" width="64px" /></h2>
+  <div style="font-size: 0.5em">
+    #1 Webpack contributor
+  </div>
   <img src="sokra_contributions.png" />
 </section>
 <section>
@@ -65,7 +133,7 @@
     Their reason?
   </h2>
   <p><a href="https://webpack.js.org/plugins/dll-plugin/">DLLPlugin</a> wasn't good enough</p>
-  <pre><code data-line-numbers="4">new webpack.DllReferencePlugin({
+  <pre><code data-line-numbers="3">new webpack.DllReferencePlugin({
   context: __dirname,
   manifest: require('./manifest.json'),
   scope: 'xyz',
@@ -114,17 +182,17 @@
   </h2>
   <pre>
     <code>
-      import('website-one/MegaNav')
+      import('website-one/Button')
     </code>
   </pre>
 </section>
 <section>
   <h2>
-    <a href="https://github.com/webpack/webpack/pulls?q=is%3Apr+is%3Amerged+federation">The solution PRs</a>
+    The solution's <a href="https://github.com/webpack/webpack/projects/6">code</a>
   </h2>
-  It's been 10 months since <a href="https://github.com/webpack/webpack/projects/6">the groundwork,</a> the earliest beta release was in May 2020
-  <ol style="font-size: 0.7em">
-    <li>feat: support custom chunk name in container expose options</li>
+  It's been a 9 months since the beta release in May 2020
+  <ul style="font-size: 0.7em">
+    <li>Februrary 2021, feat: support custom chunk name in container expose options</li>
     <li>fix: minified versionLt did not match the original function</li>
     <li>A few little bugfixes to Module Federation</li>
     <li>rename module federation classes for be more specific</li>
@@ -132,10 +200,11 @@
     <li>add script external</li>
     <li>Versioned shared modules for Module Federation</li>
     <li>change Module Federation API to be more similar to exports field</li>
-    <li>Merge Module Federation into webpack 5 beta</li>
+    <li>May 2020, Merge Module Federation into webpack 5 beta</li>
     <li>Module federation bugfixes and DX</li>
     <li>fix: module federation plugin library should be optional</li>
-  </ol>
+    <li>Februrary 2020, Add ModuleFederationPlugin and full test case</li>
+  </ul>
 </section>
 <section>
   <h2>
@@ -148,55 +217,77 @@
   </ul>
 </section>
 <section>
+  <img src="federated-module-internals.png" />
+  <p>
+  - <a href="https://medium.com/@ScriptedAlchemy/micro-fe-architecture-webpack-5-module-federation-and-custom-startup-code-9cb3fcd066c">Zack Jackson on Medium</a>
+  </p>
+</section>
+<section>
   ContainerPlugin allows runtime injection
   <pre><code>new ModuleContainerPlugin({
-  name: 'app_one',
+  name: 'app_two',
   shared: {
-    react: 'react',
+    react: { singleton: true },
+    'react-dom': { singleton: true }
   },
   exposes: {
-    Title: './src/components/Title'
+    Button: './src/Button'
   }
 });</code></pre>
+  via an old feature
   <pre><code>__webpack_override__({
-    Title: () => () => 'I will override Title module',
+  Button: () => 'I will override Button module',
 });
   </code></pre>
 </section>
 <section>
   ContainerReferencePlugin allows naming remotes
-  <pre><code data-line-numbers="3">new ModuleReferencePlugin({
+  <pre><code data-line-numbers="4">new ModuleReferencePlugin({
   remoteType: 'global',
-  remotes: ['app_one', 'app_two'],
+  remotes: {
+    app_two: 'app_two@http://app_two_url.com'
+  },
   overrides: {
-    react: 'react'
+    react: { singleton: true },
+    'react-dom': { singleton: true }
   }
 });
   </code></pre>
 </section>
-<section>
+<section style="font-size: 0.9em">
   <h2>
     All together
   </h2>
   <pre><code>new ModuleFederationPlugin({
-    name: 'app_one',
-    remotes: {
-        app_two: 'app_two'
-    },
-    shared: ['react', 'react-dom']
+  name: 'app_one',
+  remotes: {
+    app_two: 'app_two@http://app_two_url.com'
+  },
+  shared: {
+    react: { singleton: true },
+    'react-dom': { singleton: true }
+  }
 })</code></pre>
   and
   <pre><code>new ModuleFederationPlugin({
-    name: 'app_two',
-    exposes: {
-        Title: './src/components/Title'
-    },
-    shared: ['react', 'react-dom']
+  name: 'app_two',
+  exposes: {
+    Button: './src/Button'
+  },
+  shared: {
+    react: { singleton: true },
+    'react-dom': { singleton: true }
+  }
 })</code></pre></section>
 <section>
   <h2>
-    Simple demo
+    Basic <a href="https://github.com/module-federation/module-federation-examples/tree/master/basic-host-remote">demo</a>
   </h2>
+  From <a href="https://github.com/module-federation/module-federation-examples">ScriptedAlchemy's holy repo</a>:
+  <ul>
+    <li>app1 is host</li>
+    <li>app2 is remote that exposes Button</li>
+  </ul>
 </section>
 <section>
   <h2>
@@ -221,13 +312,47 @@
   <h2>
     More demos
   </h2>
-  <a href="https://github.com/module-federation/module-federation-examples">ScriptedAlchemy's holy repo</a>
+  <ul>
+    <li><a href="https://github.com/module-federation/module-federation-examples/tree/master/shared-context">Shared context</a></li>
+    <li><a href="https://github.com/module-federation/module-federation-examples/tree/master/shared-routing">Shared routing</a></li>
+</section>
+<section>
+  <h2>
+    Demo: <a href="https://cloud.redhat.com">cloud.redhat.com</a>
+  </h2>
+  <a href="https://github.com/RedHatInsights/insights-chrome">Insights-chrome</a> tries to load remote entrypoint first from a <a href="https://github.com/RedHatInsights/access-requests-frontend-build/blob/ci-beta/fed-mods.json">fed-mods.json file</a>!
+  <ul>
+    <li>Saves reloading chrome and shared modules (patternfly, react, react-redux, lodash) on cross-app navigation</li>
+    <li><a href="https://github.com/RedHatInsights/insights-chrome/blob/chrome-2.0/docs/migrationGuide.md">Migration guide</a></li>
+  </ul>
+</section>
+<section>
+  <h2>
+    Demo: <a href="https://qaprodauth.cloud.redhat.com/beta/application-services/openshift-streams">Managed Kafka</a>
+  </h2>
+  <ul>
+    <li><a href="https://github.com/bf2fc6cc711aee1a0c2a/mk-ui-host">Host app</a> wraps <a href="https://github.com/bf2fc6cc711aee1a0c2a/mk-ui-frontend">mk-ui-frontend</a> and <a href="https://github.com/RedHatInsights/rhosak-data-plane-ui-build/tree/ci-beta">strimzi</a></li>
+    <li>Allows developing mk-ui-frontend and strimzi without CRC env</li>
+    <li>Host loads OpenshiftStreams components from Strimzi</li>
+  </ul>
+</section>
+<section>
+  <h2>
+    OpenshiftStreams
+  </h2>
+  <img src="openshift-streams.png" />
 </section>
 <section>
   <h2>
     Gotcha #1: No dynamic remotes
   </h2>
   To use dynamic remotes you can use <a href="https://github.com/module-federation/module-federation-examples/blob/master/advanced-api/dynamic-remotes/app1/src/App.js#L3">~80 lines of boilerplate</a>
+  <p>
+    Managed Kafka wrote <a href="https://github.com/bf2fc6cc711aee1a0c2a/mk-ui-host/blob/main/src/app/Components/FederatedModule/FederatedModule.tsx#L3"> a dynamic loader
+  </p>
+  <p>
+    cloud.redhat.com created <a href="https://github.com/scalprum/scaffloding/blob/main/packages/core/src/index.ts#L135">scalprum</a> as a dynamic loader
+  </p>
 </section>
 <section>
   <h2>
@@ -236,13 +361,17 @@
   To avoid hardcoding at build time: <a href="https://github.com/module-federation/module-federation-examples/blob/master/startup-code/app2/webpack.config.js"><code>publicPath: 'auto'</code></a>
 </section>
 <section>
-  <blockquote>
-    This is my latest obsession in an attempt to take back control from tag management teams. The approach isn’t immediately understood, considering tags are external scripts. Luckily, part of module Federation was rewriting externals and how it works. So vendor tags can be added as async external scripts that webpack can load on demand. Analytics code and other integrations could be imported into the application lifecycle or internal state. You’d also be able to async import vendor when needed since webpack is managing the code.
-  </blockquote>
-  - <a href="https://medium.com/@ScriptedAlchemy/micro-fe-architecture-webpack-5-module-federation-and-custom-startup-code-9cb3fcd066c">Zack Jackson on Medium</a>
+  <h2>
+    Gotcha #3: CORS
+  </h2>
+  Your remotes must not disallow the host's origin.
+  <br />
+  https://some-openshift-app.com
+  <br />
+  cannot load
+  <br />
+  https://cloud.redhat.com/apps/remote/remoteEntry.js
 </section>
-
-
       </div>
     </div>
 
